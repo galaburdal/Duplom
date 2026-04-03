@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.pkl
+*.sqlite3
+
+# Virtual environment
+venv/
+.env
+.venv/
+
+# IDEs
+.vscode/
+.idea/
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Data files (можна ігнорувати, якщо не хочеш зберігати локальні дані)
+data.json
