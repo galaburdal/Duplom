@@ -1,23 +1,37 @@
-# Python
+# Python cache
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
-*.pkl
-*.sqlite3
 
 # Virtual environment
 venv/
-.env
 .venv/
+env/
 
-# IDEs
+# IDE settings
 .vscode/
 .idea/
+*.iml
 
-# System files
+# OS files
 .DS_Store
 Thumbs.db
 
-# Data files (можна ігнорувати, якщо не хочеш зберігати локальні дані)
+# Logs
+*.log
+
+# Build / distribution
+build/
+dist/
+*.egg-info/
+
+# Local data files (optional)
+# Якщо не хочеш комітити фінансові дані, залиш це:
 data.json
+
+# Matplotlib cache
+.matplotlib/
+
+# Jupyter (якщо буде використовуватись)
+.ipynb_checkpoints/
