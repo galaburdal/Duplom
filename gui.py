@@ -416,47 +416,93 @@ class FinanceApp(ctk.CTk):
         )
         title.pack(pady=(30, 15), padx=30, anchor="w")
 
-        result = self.forecaster.forecast_next_month()
+        result = self.forecaster.forecast_next_30_days()
 
         box = ctk.CTkFrame(self.content_frame, fg_color=CARD_COLOR, corner_radius=20)
         box.pack(fill="x", padx=30, pady=10)
 
         if result["status"] == "error":
-            label = ctk.CTkLabel(box, text=result["message"], text_color="red")
+            label = ctk.CTkLabel(
+                box,
+                text=result["message"],
+                text_color="red",
+                font=ctk.CTkFont(size=14)
+            )
             label.pack(pady=20)
             return
 
-        forecast_value = result["forecast"]
-        summary = self.forecaster.get_forecast_summary()
+        info_text = (
+            f"Модель: {result['model']}\n"
+            f"Прогноз загальних витрат на наступні 30 днів: {result['total_forecast']} грн\n"
+            f"MAE: {result['mae']} | MSE: {result['mse']} | R²: {result['r2']}\n"
+            f"Тренд витрат: {result['trend']}"
+        )
 
         lbl = ctk.CTkLabel(
             box,
-            text=f"Прогноз витрат на наступний місяць: {forecast_value} грн",
-            font=ctk.CTkFont(size=18, weight="bold"),
-            text_color=ACCENT_COLOR
+            text=info_text,
+            font=ctk.CTkFont(size=15, weight="bold"),
+            text_color=ACCENT_COLOR,
+            justify="left"
         )
-        lbl.pack(pady=(20, 10))
+        lbl.pack(pady=(20, 15), padx=20, anchor="w")
 
-        lbl2 = ctk.CTkLabel(
-            box,
-            text=summary,
-            font=ctk.CTkFont(size=14),
-            wraplength=900
+        rec_title = ctk.CTkLabel(
+            self.content_frame,
+            text="AI-рекомендації:",
+            font=ctk.CTkFont(size=18, weight="bold"),
+            text_color=TEXT_COLOR
         )
-        lbl2.pack(pady=(0, 20))
+        rec_title.pack(pady=(15, 5), padx=30, anchor="w")
+
+        rec_box = ctk.CTkTextbox(self.content_frame, height=120, corner_radius=15)
+        rec_box.pack(fill="x", padx=30, pady=(0, 15))
+        rec_box.configure(state="normal")
+
+        recommendations = self.forecaster.generate_ai_recommendations()
+        for rec in recommendations:
+            rec_box.insert("end", f"• {rec}\n")
+
+        rec_box.configure(state="disabled")
+
+        chart_title = ctk.CTkLabel(
+            self.content_frame,
+            text="Графік прогнозування:",
+            font=ctk.CTkFont(size=18, weight="bold"),
+            text_color=TEXT_COLOR
+        )
+        chart_title.pack(pady=(10, 5), padx=30, anchor="w")
+
+        chart_frame = ctk.CTkFrame(self.content_frame, fg_color="#ffffff", corner_radius=15)
+        chart_frame.pack(fill="both", expand=False, padx=30, pady=(0, 15))
+
+        self.charts.draw_forecast_chart(
+            result["daily_history"],
+            result["future_forecast"],
+            chart_frame
+        )
 
         cat_forecast = self.forecaster.forecast_by_category()
 
-        text = "Прогноз витрат по категоріях:\n\n"
-        for cat, val in cat_forecast.items():
-            text += f"• {cat}: {val} грн\n"
+        cat_title = ctk.CTkLabel(
+            self.content_frame,
+            text="Прогноз по категоріях:",
+            font=ctk.CTkFont(size=18, weight="bold"),
+            text_color=TEXT_COLOR
+        )
+        cat_title.pack(pady=(10, 5), padx=30, anchor="w")
 
-        textbox = ctk.CTkTextbox(self.content_frame, height=250, corner_radius=15)
-        textbox.pack(fill="x", padx=30, pady=15)
-        textbox.configure(state="normal")
-        textbox.insert("end", text)
-        textbox.configure(state="disabled")
+        cat_box = ctk.CTkTextbox(self.content_frame, height=160, corner_radius=15)
+        cat_box.pack(fill="x", padx=30, pady=(0, 20))
+        cat_box.configure(state="normal")
 
+        if cat_forecast:
+            for cat, val in cat_forecast.items():
+                cat_box.insert("end", f"• {cat}: {val} грн\n")
+        else:
+            cat_box.insert("end", "Недостатньо даних для прогнозу по категоріях.\n")
+
+        cat_box.configure(state="disabled")
 
     def export_csv(self):
         self.manager.export_to_csv()

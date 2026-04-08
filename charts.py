@@ -120,3 +120,45 @@ class ChartBuilder:
         canvas = FigureCanvasTkAgg(fig, master=frame)
         canvas.draw()
         canvas.get_tk_widget().pack(fill="both", expand=True)
+
+    def draw_forecast_chart(self, history_df, forecast_df, frame):
+        self.clear_frame(frame)
+
+        if history_df is None or forecast_df is None:
+            return
+
+        fig, ax = plt.subplots(figsize=(10, 4), dpi=110)
+
+        ax.plot(
+            history_df["date"],
+            history_df["amount"],
+            marker="o",
+            linewidth=2,
+            label="Історичні витрати"
+        )
+
+        ax.plot(
+            forecast_df["date"],
+            forecast_df["forecast"],
+            marker="o",
+            linestyle="--",
+            linewidth=2,
+            label="Прогноз витрат"
+        )
+
+        if len(history_df) > 0:
+            last_date = history_df["date"].max()
+            ax.axvline(last_date, linestyle=":", linewidth=2)
+
+        ax.set_title("Прогноз витрат на наступні 30 днів", fontsize=12)
+        ax.set_xlabel("Дата")
+        ax.set_ylabel("Сума витрат")
+        ax.legend()
+        ax.grid(True)
+
+        fig.autofmt_xdate(rotation=45)
+        fig.tight_layout(pad=2)
+
+        canvas = FigureCanvasTkAgg(fig, master=frame)
+        canvas.draw()
+        canvas.get_tk_widget().pack(fill="both", expand=True)
