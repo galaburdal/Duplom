@@ -1,23 +1,24 @@
 import customtkinter as ctk
 from tkinter import messagebox
+from datetime import datetime
+
 from finance import PersonalFinanceManager
 from analytics import FinanceAnalytics
 from forecast import ExpenseForecaster
 from charts import ChartBuilder
-from datetime import datetime
 
 
-# --- Стиль програми ---
-ctk.set_appearance_mode("dark")  # dark mode
+ctk.set_appearance_mode("dark")
 ctk.set_default_color_theme("blue")
 
 
-# --- Основні кольори (ніжний бежевий стиль) ---
 BG_COLOR = "#1e1e1e"
 SIDEBAR_COLOR = "#2a2a2a"
 CARD_COLOR = "#2f2f2f"
-BUTTON_COLOR = "#c8b6a6"      # ніжний беж
+
+BUTTON_COLOR = "#c8b6a6"
 BUTTON_HOVER = "#bfa892"
+
 TEXT_COLOR = "#f2f2f2"
 ACCENT_COLOR = "#e0c9a6"
 
@@ -30,20 +31,17 @@ class FinanceApp(ctk.CTk):
         self.geometry("1100x700")
         self.minsize(1100, 700)
 
-        # --- Менеджери ---
         self.manager = PersonalFinanceManager()
         self.analytics = FinanceAnalytics(self.manager)
         self.forecaster = ExpenseForecaster(self.manager)
         self.charts = ChartBuilder()
 
-        # --- Основний контейнер ---
         self.grid_columnconfigure(1, weight=1)
         self.grid_rowconfigure(0, weight=1)
 
-        # --- Sidebar ---
         self.sidebar = ctk.CTkFrame(self, width=250, fg_color=SIDEBAR_COLOR, corner_radius=0)
         self.sidebar.grid(row=0, column=0, sticky="nswe")
-        self.sidebar.grid_rowconfigure(8, weight=1)
+        self.sidebar.grid_rowconfigure(10, weight=1)
 
         self.logo_label = ctk.CTkLabel(
             self.sidebar,
@@ -61,7 +59,6 @@ class FinanceApp(ctk.CTk):
         )
         self.menu_label.grid(row=1, column=0, padx=20, pady=(0, 10), sticky="w")
 
-        # --- Кнопки меню ---
         self.btn_dashboard = self.create_sidebar_button("📊 Dashboard", self.show_dashboard)
         self.btn_dashboard.grid(row=2, column=0, padx=20, pady=10, sticky="we")
 
@@ -86,18 +83,15 @@ class FinanceApp(ctk.CTk):
             font=ctk.CTkFont(size=12),
             text_color="gray"
         )
-        self.footer_label.grid(row=9, column=0, padx=20, pady=20)
+        self.footer_label.grid(row=11, column=0, padx=20, pady=20)
 
-        # --- Контентна зона справа ---
         self.content_frame = ctk.CTkFrame(self, fg_color=BG_COLOR, corner_radius=0)
         self.content_frame.grid(row=0, column=1, sticky="nswe")
         self.content_frame.grid_columnconfigure(0, weight=1)
         self.content_frame.grid_rowconfigure(0, weight=1)
 
-        self.current_page = None
-
-        # стартова сторінка
         self.show_dashboard()
+
 
     def create_sidebar_button(self, text, command):
         return ctk.CTkButton(
@@ -116,9 +110,22 @@ class FinanceApp(ctk.CTk):
         for widget in self.content_frame.winfo_children():
             widget.destroy()
 
-    # ==========================================================
-    # DASHBOARD
-    # ==========================================================
+    def create_card(self, parent, title, value, col):
+        card = ctk.CTkFrame(parent, fg_color=CARD_COLOR, corner_radius=20, height=120)
+        card.grid(row=0, column=col, padx=10, pady=10, sticky="we")
+
+        lbl_title = ctk.CTkLabel(card, text=title, font=ctk.CTkFont(size=16, weight="bold"))
+        lbl_title.pack(pady=(20, 5))
+
+        lbl_value = ctk.CTkLabel(
+            card,
+            text=value,
+            font=ctk.CTkFont(size=22, weight="bold"),
+            text_color=ACCENT_COLOR
+        )
+        lbl_value.pack()
+
+
     def show_dashboard(self):
         self.clear_content()
 
@@ -134,7 +141,6 @@ class FinanceApp(ctk.CTk):
 
         cards_frame = ctk.CTkFrame(self.content_frame, fg_color=BG_COLOR)
         cards_frame.pack(fill="x", padx=30)
-
         cards_frame.grid_columnconfigure((0, 1, 2), weight=1)
 
         self.create_card(cards_frame, "Доходи", f"{report['total_income']} грн", 0)
@@ -158,19 +164,7 @@ class FinanceApp(ctk.CTk):
 
         rec_box.configure(state="disabled")
 
-    def create_card(self, parent, title, value, col):
-        card = ctk.CTkFrame(parent, fg_color=CARD_COLOR, corner_radius=20, height=120)
-        card.grid(row=0, column=col, padx=10, pady=10, sticky="we")
 
-        lbl_title = ctk.CTkLabel(card, text=title, font=ctk.CTkFont(size=16, weight="bold"))
-        lbl_title.pack(pady=(20, 5))
-
-        lbl_value = ctk.CTkLabel(card, text=value, font=ctk.CTkFont(size=22, weight="bold"), text_color=ACCENT_COLOR)
-        lbl_value.pack()
-
-    # ==========================================================
-    # ADD TRANSACTION
-    # ==========================================================
     def show_add_transaction(self):
         self.clear_content()
 
@@ -187,18 +181,15 @@ class FinanceApp(ctk.CTk):
 
         form.grid_columnconfigure((0, 1), weight=1)
 
-        self.type_var = ctk.StringVar(value="expense")
-
         type_label = ctk.CTkLabel(form, text="Тип:", font=ctk.CTkFont(size=14, weight="bold"))
         type_label.grid(row=0, column=0, padx=20, pady=(20, 5), sticky="w")
 
-        self.type_menu = ctk.CTkOptionMenu(
+        self.type_option = ctk.CTkOptionMenu(
             form,
-            values=["expense", "income"],
-            variable=self.type_var,
+            values=["Дохід", "Витрата"],
             corner_radius=15
         )
-        self.type_menu.grid(row=0, column=1, padx=20, pady=(20, 5), sticky="we")
+        self.type_option.grid(row=0, column=1, padx=20, pady=(20, 5), sticky="we")
 
         amount_label = ctk.CTkLabel(form, text="Сума:", font=ctk.CTkFont(size=14, weight="bold"))
         amount_label.grid(row=1, column=0, padx=20, pady=10, sticky="w")
@@ -232,12 +223,12 @@ class FinanceApp(ctk.CTk):
         add_btn.grid(row=4, column=0, columnspan=2, padx=20, pady=(20, 20), sticky="we")
 
     def add_transaction(self):
-        t_type = self.type_var.get()
-        amount = self.amount_entry.get()
-        category = self.category_entry.get()
-        date = self.date_entry.get()
+        transaction_type = self.type_option.get()
+        category = self.category_entry.get().strip().capitalize()
+        amount = self.amount_entry.get().strip()
+        date = self.date_entry.get().strip()
 
-        if not amount or not category or not date:
+        if not category or not amount or not date:
             messagebox.showerror("Помилка", "Заповніть всі поля!")
             return
 
@@ -245,61 +236,139 @@ class FinanceApp(ctk.CTk):
             amount = float(amount)
             if amount <= 0:
                 raise ValueError
-
-        except ValueError:
+        except:
             messagebox.showerror("Помилка", "Сума повинна бути числом більше 0!")
             return
 
         try:
             datetime.strptime(date, "%Y-%m-%d")
-        except ValueError:
-            messagebox.showerror("Помилка", "Невірний формат дати! Використовуйте YYYY-MM-DD")
+        except:
+            messagebox.showerror("Помилка", "Дата повинна бути у форматі YYYY-MM-DD!")
             return
 
-        if t_type == "income":
+        if transaction_type == "Дохід":
             self.manager.add_income(amount, category, date)
+            messagebox.showinfo("Успіх", "Дохід додано!")
         else:
             self.manager.add_expense(amount, category, date)
+            messagebox.showinfo("Успіх", "Витрату додано!")
 
-        messagebox.showinfo("Успіх", "Транзакцію додано!")
         self.amount_entry.delete(0, "end")
         self.category_entry.delete(0, "end")
         self.date_entry.delete(0, "end")
 
-    # ==========================================================
-    # TRANSACTIONS LIST
-    # ==========================================================
+
     def show_transactions(self):
         self.clear_content()
 
-        title = ctk.CTkLabel(
+        title_label = ctk.CTkLabel(
             self.content_frame,
             text="Транзакції",
             font=ctk.CTkFont(size=26, weight="bold"),
             text_color=ACCENT_COLOR
         )
-        title.pack(pady=(30, 15), padx=30, anchor="w")
+        title_label.pack(pady=(30, 15), padx=30, anchor="w")
 
-        box = ctk.CTkTextbox(self.content_frame, corner_radius=15)
-        box.pack(fill="both", expand=True, padx=30, pady=10)
+        container = ctk.CTkFrame(self.content_frame, fg_color=BG_COLOR)
+        container.pack(fill="both", expand=True, padx=30, pady=10)
 
-        transactions = self.manager.get_transactions()
+        container.grid_rowconfigure(0, weight=1)
+        container.grid_columnconfigure(0, weight=1)
 
-        box.configure(state="normal")
-        box.delete("1.0", "end")
+        self.transactions_textbox = ctk.CTkTextbox(container, corner_radius=15)
+        self.transactions_textbox.grid(row=0, column=0, sticky="nsew", pady=(0, 10))
 
-        if not transactions:
-            box.insert("end", "Немає транзакцій.\n")
+        button_frame = ctk.CTkFrame(container, fg_color=BG_COLOR)
+        button_frame.grid(row=1, column=0, sticky="we")
+
+        button_frame.grid_columnconfigure((0, 1), weight=1)
+
+        refresh_btn = ctk.CTkButton(
+            button_frame,
+            text="🔄 Оновити",
+            fg_color=BUTTON_COLOR,
+            hover_color=BUTTON_HOVER,
+            text_color="#1a1a1a",
+            corner_radius=18,
+            height=40,
+            font=ctk.CTkFont(size=14, weight="bold"),
+            command=self.load_transactions
+        )
+        refresh_btn.grid(row=0, column=0, padx=5, pady=5, sticky="we")
+
+        delete_btn = ctk.CTkButton(
+            button_frame,
+            text="🗑 Видалити",
+            fg_color="#d9534f",
+            hover_color="#c9302c",
+            text_color="white",
+            corner_radius=18,
+            height=40,
+            font=ctk.CTkFont(size=14, weight="bold"),
+            command=self.delete_selected_transaction
+        )
+        delete_btn.grid(row=0, column=1, padx=5, pady=5, sticky="we")
+
+        self.load_transactions()
+
+    def load_transactions(self):
+        self.transactions_textbox.configure(state="normal")
+        self.transactions_textbox.delete("1.0", "end")
+
+        self.transactions_cache = self.manager.get_transactions_with_index()
+
+        if not self.transactions_cache:
+            self.transactions_textbox.insert("end", "Немає транзакцій.\n")
+            self.transactions_textbox.configure(state="disabled")
+            return
+
+        for i, t in enumerate(self.transactions_cache):
+            t_type = "ДОХІД" if t["type"] == "income" else "ВИТРАТА"
+            self.transactions_textbox.insert(
+                "end",
+                f"{i+1}. [{t['date']}] {t_type} | {t['category']} | {t['amount']} грн\n"
+            )
+
+        self.transactions_textbox.configure(state="disabled")
+
+    def delete_selected_transaction(self):
+        if not hasattr(self, "transactions_cache") or not self.transactions_cache:
+            messagebox.showerror("Помилка", "Список транзакцій порожній.")
+            return
+
+        try:
+            cursor_position = self.transactions_textbox.index("insert")
+            line_number = int(cursor_position.split(".")[0]) - 1
+        except:
+            messagebox.showerror("Помилка", "Не вдалося визначити транзакцію.")
+            return
+
+        if line_number < 0 or line_number >= len(self.transactions_cache):
+            messagebox.showerror("Помилка", "Оберіть транзакцію (поставте курсор на рядок).")
+            return
+
+        transaction = self.transactions_cache[line_number]
+
+        confirm = messagebox.askyesno(
+            "Підтвердження",
+            f"Видалити транзакцію?\n\n"
+            f"Дата: {transaction['date']}\n"
+            f"Категорія: {transaction['category']}\n"
+            f"Сума: {transaction['amount']} грн"
+        )
+
+        if not confirm:
+            return
+
+        success = self.manager.delete_transaction(transaction["type"], transaction["index"])
+
+        if success:
+            messagebox.showinfo("Успіх", "Транзакцію видалено!")
+            self.load_transactions()
         else:
-            for t in transactions:
-                t_type = "ДОХІД" if t["type"] == "income" else "ВИТРАТА"
-                box.insert("end", f"[{t['date']}] {t_type} | {t['category']} | {t['amount']} грн\n")
+            messagebox.showerror("Помилка", "Не вдалося видалити транзакцію.")
 
-        box.configure(state="disabled")
 
-    # ==========================================================
-    # ANALYTICS PAGE
-    # ==========================================================
     def show_analytics(self):
         self.clear_content()
 
@@ -335,9 +404,7 @@ class FinanceApp(ctk.CTk):
         expenses_month = self.analytics.expenses_by_month()
         self.charts.draw_expenses_line(expenses_month, chart3)
 
-    # ==========================================================
-    # FORECAST PAGE
-    # ==========================================================
+
     def show_forecast(self):
         self.clear_content()
 
@@ -349,17 +416,17 @@ class FinanceApp(ctk.CTk):
         )
         title.pack(pady=(30, 15), padx=30, anchor="w")
 
-        forecast_result = self.forecaster.forecast_next_month()
+        result = self.forecaster.forecast_next_month()
 
         box = ctk.CTkFrame(self.content_frame, fg_color=CARD_COLOR, corner_radius=20)
         box.pack(fill="x", padx=30, pady=10)
 
-        if forecast_result["status"] == "error":
-            label = ctk.CTkLabel(box, text=forecast_result["message"], text_color="red")
+        if result["status"] == "error":
+            label = ctk.CTkLabel(box, text=result["message"], text_color="red")
             label.pack(pady=20)
             return
 
-        forecast_value = forecast_result["forecast"]
+        forecast_value = result["forecast"]
         summary = self.forecaster.get_forecast_summary()
 
         lbl = ctk.CTkLabel(
@@ -378,7 +445,6 @@ class FinanceApp(ctk.CTk):
         )
         lbl2.pack(pady=(0, 20))
 
-        # Прогноз по категоріях
         cat_forecast = self.forecaster.forecast_by_category()
 
         text = "Прогноз витрат по категоріях:\n\n"
@@ -391,9 +457,7 @@ class FinanceApp(ctk.CTk):
         textbox.insert("end", text)
         textbox.configure(state="disabled")
 
-    # ==========================================================
-    # EXPORT CSV
-    # ==========================================================
+
     def export_csv(self):
         self.manager.export_to_csv()
         messagebox.showinfo("Експорт", "Файл report.csv збережено у папці exports/")

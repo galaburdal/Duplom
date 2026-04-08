@@ -32,13 +32,7 @@ class FinanceAnalytics:
         return dict(sorted(result.items(), key=lambda x: x[1], reverse=True))
 
     def expenses_by_month(self):
-        """
-        Повертає витрати по місяцях:
-        {
-            "2026-01": 3000,
-            "2026-02": 2500
-        }
-        """
+       
         result = defaultdict(float)
 
         for e in self.manager.data["expenses"]:
@@ -49,13 +43,7 @@ class FinanceAnalytics:
         return dict(sorted(result.items()))
 
     def income_by_month(self):
-        """
-        Повертає доходи по місяцях:
-        {
-            "2026-01": 8000,
-            "2026-02": 7500
-        }
-        """
+       
         result = defaultdict(float)
 
         for i in self.manager.data["income"]:
@@ -82,12 +70,7 @@ class FinanceAnalytics:
         return round(sum(monthly.values()) / len(monthly), 2)
 
     def spending_trend(self):
-        """
-        Аналіз тренду витрат:
-        - якщо останній місяць > середнього → "increasing"
-        - якщо останній місяць < середнього → "decreasing"
-        - інакше "stable"
-        """
+       
         monthly = self.expenses_by_month()
 
         if len(monthly) < 2:
@@ -105,9 +88,7 @@ class FinanceAnalytics:
             return "stable"
 
     def generate_recommendations(self):
-        """
-        Формує список рекомендацій для користувача.
-        """
+        
         recommendations = []
 
         balance = self.balance()
@@ -139,9 +120,7 @@ class FinanceAnalytics:
         return recommendations
 
     def get_full_report(self):
-        """
-        Повертає повний звіт як словник.
-        """
+        
         return {
             "total_income": round(self.total_income(), 2),
             "total_expenses": round(self.total_expenses(), 2),

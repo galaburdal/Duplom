@@ -161,7 +161,7 @@ python --version
 
 У папці з проєктом потрібно виконати команду:
 ```bash
-pip install -r requirements.txt
+python -m pip install -r requirements.txt
 ```
 Ця команда автоматично встановить всі необхідні бібліотеки.
 

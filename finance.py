@@ -144,3 +144,45 @@ class PersonalFinanceManager:
             for t in transactions:
                 t_type = "Дохід" if t["type"] == "income" else "Витрата"
                 writer.writerow([t_type, t["amount"], t["category"], t["date"]])
+
+    def delete_transaction(self, transaction_type, index):
+   
+        if transaction_type == "income":
+            if 0 <= index < len(self.data["income"]):
+                self.data["income"].pop(index)
+                self.save_data()
+                return True
+
+        elif transaction_type == "expense":
+            if 0 <= index < len(self.data["expenses"]):
+                self.data["expenses"].pop(index)
+                self.save_data()
+                return True
+
+        return False
+
+
+    def get_transactions_with_index(self):
+    
+        transactions = []
+
+        for i, inc in enumerate(self.data["income"]):
+            transactions.append({
+                "type": "income",
+                "index": i,
+                "amount": inc["amount"],
+                "category": inc["category"],
+                "date": inc["date"]
+            })
+
+        for i, exp in enumerate(self.data["expenses"]):
+            transactions.append({
+                "type": "expense",
+                "index": i,
+                "amount": exp["amount"],
+                "category": exp["category"],
+                "date": exp["date"]
+            })
+
+        transactions.sort(key=lambda x: x["date"])
+        return transactions                
