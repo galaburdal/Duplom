@@ -6,36 +6,43 @@ class FinanceAnalytics:
     def __init__(self, finance_manager):
         self.manager = finance_manager
 
+    def _profile_data(self):
+        return self.manager._current_profile_data()
+
     def total_income(self):
-        return sum(i["amount"] for i in self.manager.data["income"])
+        profile = self._profile_data()
+        return sum(i["amount"] for i in profile["income"])
 
     def total_expenses(self):
-        return sum(e["amount"] for e in self.manager.data["expenses"])
+        profile = self._profile_data()
+        return sum(e["amount"] for e in profile["expenses"])
 
     def balance(self):
         return self.total_income() - self.total_expenses()
 
     def expenses_by_category(self):
+        profile = self._profile_data()
         result = defaultdict(float)
 
-        for e in self.manager.data["expenses"]:
+        for e in profile["expenses"]:
             result[e["category"]] += float(e["amount"])
 
         return dict(sorted(result.items(), key=lambda x: x[1], reverse=True))
 
     def income_by_category(self):
+        profile = self._profile_data()
         result = defaultdict(float)
 
-        for i in self.manager.data["income"]:
+        for i in profile["income"]:
             result[i["category"]] += float(i["amount"])
 
         return dict(sorted(result.items(), key=lambda x: x[1], reverse=True))
 
     def expenses_by_month(self):
-       
+        profile = self._profile_data()
         result = defaultdict(float)
 
-        for e in self.manager.data["expenses"]:
+        for e in profile["expenses"]:
             date_obj = datetime.strptime(e["date"], "%Y-%m-%d")
             month_key = date_obj.strftime("%Y-%m")
             result[month_key] += float(e["amount"])
@@ -43,10 +50,10 @@ class FinanceAnalytics:
         return dict(sorted(result.items()))
 
     def income_by_month(self):
-       
+        profile = self._profile_data()
         result = defaultdict(float)
 
-        for i in self.manager.data["income"]:
+        for i in profile["income"]:
             date_obj = datetime.strptime(i["date"], "%Y-%m-%d")
             month_key = date_obj.strftime("%Y-%m")
             result[month_key] += float(i["amount"])
@@ -70,7 +77,6 @@ class FinanceAnalytics:
         return round(sum(monthly.values()) / len(monthly), 2)
 
     def spending_trend(self):
-       
         monthly = self.expenses_by_month()
 
         if len(monthly) < 2:
@@ -88,7 +94,6 @@ class FinanceAnalytics:
             return "stable"
 
     def generate_recommendations(self):
-        
         recommendations = []
 
         balance = self.balance()
@@ -108,6 +113,8 @@ class FinanceAnalytics:
             recommendations.append("Добре! Витрати зменшуються у порівнянні з попередніми місяцями.")
         elif trend == "stable":
             recommendations.append("Витрати стабільні. Ви добре контролюєте фінанси.")
+        else:
+            recommendations.append("Недостатньо даних для аналізу тренду витрат.")
 
         if len(top_categories) > 0:
             text = "Найбільші витрати у категоріях: "
@@ -120,7 +127,6 @@ class FinanceAnalytics:
         return recommendations
 
     def get_full_report(self):
-        
         return {
             "total_income": round(self.total_income(), 2),
             "total_expenses": round(self.total_expenses(), 2),
