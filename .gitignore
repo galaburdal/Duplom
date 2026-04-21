@@ -5,33 +5,32 @@ __pycache__/
 *.pyd
 
 # Virtual environment
-venv/
 .venv/
+venv/
 env/
 
-# IDE settings
+# VS Code
 .vscode/
-.idea/
-*.iml
 
 # OS files
 .DS_Store
 Thumbs.db
 
+# Data files (щоб не палити свої дані)
+data.json
+data/
+
+# CSV exports
+*.csv
+
 # Logs
 *.log
 
-# Build / distribution
-build/
-dist/
-*.egg-info/
+# Temporary files
+*.tmp
 
-# Local data files (optional)
-# Якщо не хочеш комітити фінансові дані, залиш це:
-data.json
+# Jupyter (якщо раптом)
+.ipynb_checkpoints/
 
 # Matplotlib cache
 .matplotlib/
-
-# Jupyter (якщо буде використовуватись)
-.ipynb_checkpoints/
