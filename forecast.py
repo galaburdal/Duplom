@@ -101,10 +101,8 @@ class ExpenseForecaster:
             stable_base = self._stable_level(y)
             volatility = self._volatility_buffer(y)
 
-            # Комбінуємо регресію з базовим рівнем
             blended_pred = 0.45 * raw_future_pred + 0.55 * stable_base
 
-            # Межі, щоб прогноз не провалювався до нуля і не був нереалістичним
             lower_bound = max(np.median(y) * 0.55, np.min(y) * 0.35, 50)
             upper_bound = max(np.max(y) * 1.20, stable_base * 1.8)
 

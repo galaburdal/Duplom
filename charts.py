@@ -19,11 +19,6 @@ class ChartBuilder:
             widget.destroy()
 
     def _prepare_pie_data(self, data, top_n=6):
-        """
-        Сортує категорії за спаданням.
-        Якщо категорій забагато — залишає найбільші,
-        решту об'єднує в 'Інші'.
-        """
         if not data:
             return [], []
 
@@ -49,17 +44,9 @@ class ChartBuilder:
         return labels, values
 
     def _autopct_visible_only(self, pct):
-        """
-        Показує відсоток тільки для відносно помітних секторів,
-        щоб текст не злипався.
-        """
         return f"{pct:.1f}%" if pct >= 5 else ""
 
     def _draw_side_legend(self, ax, labels, values, colors, title="Категорії"):
-        """
-        Малює власну 'легенду' у правій частині фігури,
-        щоб нічого не обрізалось і не накладалось на діаграму.
-        """
         ax.set_xlim(0, 1)
         ax.set_ylim(0, 1)
         ax.axis("off")

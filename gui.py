@@ -770,7 +770,7 @@ class FinanceApp(ctk.CTk):
 
             rec_title = ctk.CTkLabel(
                 result_frame,
-                text="AI-рекомендації:",
+                text="ШI-рекомендації:",
                 font=ctk.CTkFont(size=18, weight="bold"),
                 text_color=TEXT_COLOR
             )
